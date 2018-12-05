@@ -118,21 +118,28 @@ class Win(QMainWindow):
         print(self.image_list)
 
     def next(self):
-        h = self.height()
-        w = self.width()
-        area = h*w
-
         if len(self.image_list) - self.index > 1:
             self.index += 1
         else:
             self.index = 0
+
+        h = self.height()
+        w = self.width()
         im = Image.open(self.image_list[self.index])
         im_h = im.size[0]
         im_w = im.size[1]
-        im_area = im_h*im_w
+        im.close()
         self.file = QPixmap(self.image_list[self.index])
-        self.file = self.file.scaled(int(im_w*(im_area/area)*100),int(im_h*(im_area/area)*100))
-        # self.file = self.file.scaled(1,1)
+        n = h/(im_h)
+        h_2 = im_h * n
+        w_2 = im_w * n
+        h_3 = h_2 - (h_2 - 720)
+        part = h_2 / h_3
+        w_2 *= part
+        w_3 = w_2 - (h_2 - 720)
+        part = w_2/w_3
+        h_3 *= part
+        self.file = self.file.scaled(h_3,w_3)
         self.lbl.setPixmap(self.file)
 
     def previous(self):
@@ -141,9 +148,23 @@ class Win(QMainWindow):
         else:
             self.index = 0
 
-        print(self.index)
+        h = self.height()
+        w = self.width()
+        im = Image.open(self.image_list[self.index])
+        im_h = im.size[0]
+        im_w = im.size[1]
+        im.close()
         self.file = QPixmap(self.image_list[self.index])
-
+        n = h / (im_h)
+        h_2 = im_h * n
+        w_2 = im_w * n
+        h_3 = h_2 - (h_2 - 720)
+        part = h_2 / h_3
+        w_2 *= part
+        w_3 = w_2 - (h_2 - 720)
+        part = w_2/w_3
+        h_3 *= part
+        self.file = self.file.scaled(h_3,w_3)
         self.lbl.setPixmap(self.file)
 
 
