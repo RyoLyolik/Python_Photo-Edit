@@ -4,6 +4,7 @@ import sys
 import os
 import PyQt5.QtCore
 from PIL import Image
+from vignet import Vignet
 
 
 class Win(QMainWindow):
@@ -62,11 +63,11 @@ class Win(QMainWindow):
         self.edit_photo_control.addWidget(self.make_vignet)
 
         self.file = QPixmap('E:/Sources/Photoshop/cartoon/1_1.png')  # путь
-        self.lbl = QLabel(self)
-        self.lbl.setPixmap(self.file)
-        self.lbl.move(500, 500)
+        self.lbl_ph = QLabel(self)
+        self.lbl_ph.setPixmap(self.file)
+        # self.lbl_ph.move(5000, 5000)
 
-        self.photo_area.addWidget(self.lbl)
+        self.photo_area.addWidget(self.lbl_ph)
 
         self.main_layout.addLayout(self.top_control)
         self.main_layout.addLayout(self.edit_photo_control)
@@ -77,13 +78,17 @@ class Win(QMainWindow):
 
     def vignet(self):
         im = Image.open(self.image_list[self.index])
-        size = im.size()
+        size = im.size
+        w = im.size[0]
+        h = im.size[1]
+        area = w*h
+
         print(size)
 
     def show_ph(self):
         self.way = self.input.text()
         self.file = QPixmap(self.way)
-        self.lbl.setPixmap(self.file)
+        self.lbl_ph.setPixmap(self.file)
         if '/' not in self.way and "\\" not in self.way:
             folder = os.getcwd()
             for currentdir, dirs, files in os.walk(folder):
@@ -129,6 +134,8 @@ class Win(QMainWindow):
         except:
             self.index = 0
         print(self.image_list)
+        self.next()
+        self.previous()
 
     def next(self):
         if len(self.image_list) - self.index > 1:
@@ -150,7 +157,7 @@ class Win(QMainWindow):
 
         self.file = QPixmap(self.image_list[self.index])
         self.file = self.file.scaled(int(im_w),int(im_h))
-        self.lbl.setPixmap(self.file)
+        self.lbl_ph.setPixmap(self.file)
 
     def previous(self):
         if abs(self.index) - len(self.image_list) < -1:
@@ -173,7 +180,7 @@ class Win(QMainWindow):
             im_h *= scale_coef
         self.file = QPixmap(self.image_list[self.index])
         self.file = self.file.scaled(int(im_w),int(im_h))
-        self.lbl.setPixmap(self.file)
+        self.lbl_ph.setPixmap(self.file)
 
 
 if __name__ == '__main__':
