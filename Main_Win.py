@@ -59,6 +59,7 @@ class Win(QMainWindow):
         self.zoom.setMaximum(1000)
         self.zoom.setMinimum(0)
         self.zoom.valueChanged.connect(self.zooming)
+        self.zoom.setValue(100)
         self.zoom_lbl = QLabel('100%')
 
 
@@ -106,6 +107,7 @@ class Win(QMainWindow):
         self.edit_photo_control.addWidget(self.ok)
 
         self.photo_scroll = QScrollArea()
+        self.photo_scroll.setFixedSize(750,450)
         self.file = QPixmap('E:/Sources/Photoshop/cartoon/1_1.png')  # путь
         self.lbl_ph = QLabel(self)
         self.lbl_ph.setPixmap(self.file)
@@ -122,18 +124,22 @@ class Win(QMainWindow):
         return self.main_layout
 
     def zooming(self):
-        image = Image.open(self.image_list[self.index])
-        w, h = image.size
+        try:
+            image = Image.open(self.image_list[self.index])
+            w, h = self.im_w, self.im_h
 
-        image.close()
-        size = self.zoom.value() / 100
-        print((w*size) + 100, (h*size) + 100)
+            image.close()
+            size = self.zoom.value() / 100
+            print((w*size) + 100, (h*size) + 100)
 
-        self.zoom_lbl.setText(str(size) + '%')
-        self.file = QPixmap(self.image_list[self.index])
-        self.file = self.file.scaled(w*size, h*size)
-        self.lbl_ph.setPixmap(self.file)
-        self.resize((w * size) + 100, (h * size) + 100)
+            self.zoom_lbl.setText(str(int(size*100)) + '%')
+            self.file = QPixmap(self.image_list[self.index])
+            self.file = self.file.scaled(w*size, h*size)
+            self.lbl_ph.setPixmap(self.file)
+
+            self.photo_scroll.setWidget(self.lbl_ph)
+        except IndexError:
+            pass
     def go_back(self):
         print(os.path.exists('sources\\' + self.image_list[self.index].split('\\')[-1] + ' @ Ctrl_Z.png'))
         if os.path.exists('sources\\' + self.image_list[self.index].split('\\')[-1] + ' @ Ctrl_Z.png'):
@@ -269,8 +275,36 @@ class Win(QMainWindow):
         else:
             self.index = 0
         im = Image.open(self.image_list[self.index])
-        h = self.height()
-        w = self.width()
+        h = self.photo_scroll.height()
+        w = self.photo_scroll.width()
+        im_h = im.size[1]
+        im_w = im.size[0]
+        scale_coef = (h - 135) / im_h
+        im_h = h - 135
+        im_w *= scale_coef
+        if im_w > (w - 25):
+            scale_coef = (w - 25) / im_w
+            im_w = (w - 25)
+            im_h *= scale_coef
+        self.im_w = im_w
+        self.im_h = im_h
+        self.file = QPixmap(self.image_list[self.index])
+        self.file = self.file.scaled(int(im_w), int(im_h))
+        self.lbl_ph.setFixedSize(w, h)
+        self.lbl_ph.setPixmap(self.file)
+        self.zoom.setValue(100)
+        self.zoom_lbl.setText('100%')
+        self.photo_scroll.setWidget(self.lbl_ph)
+
+
+    def previous(self):
+        if abs(self.index) - len(self.image_list) <= -1:
+            self.index -= 1
+        else:
+            self.index = 0
+        im = Image.open(self.image_list[self.index])
+        h = self.photo_scroll.height()
+        w = self.photo_scroll.width()
         im_h = im.size[1]
         im_w = im.size[0]
         scale_coef = (h - 135) / im_h
@@ -285,28 +319,10 @@ class Win(QMainWindow):
         self.file = QPixmap(self.image_list[self.index])
         self.file = self.file.scaled(int(im_w), int(im_h))
         self.lbl_ph.setPixmap(self.file)
-
-    def previous(self):
-        if abs(self.index) - len(self.image_list) <= -1:
-            self.index -= 1
-        else:
-            self.index = 0
-        im = Image.open(self.image_list[self.index])
-        h = self.height()
-        w = self.width()
-
-        im_h = im.size[1]
-        im_w = im.size[0]
-        scale_coef = (h - 135) / im_h
-        im_h = h - 135
-        im_w *= scale_coef
-        if im_w > (w - 25):
-            scale_coef = (w - 25) / im_w
-            im_w = (w - 25)
-            im_h *= scale_coef
-        self.file = QPixmap(self.image_list[self.index])
-        self.file = self.file.scaled(int(im_w), int(im_h))
-        self.lbl_ph.setPixmap(self.file)
+        self.lbl_ph.setFixedSize(w,h)
+        self.zoom.setValue(100)
+        self.zoom_lbl.setText('100%')
+        self.photo_scroll.setWidget(self.lbl_ph)
 
 
 if __name__ == '__main__':
