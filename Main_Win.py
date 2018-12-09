@@ -67,7 +67,11 @@ class Win(QMainWindow):
         self.make_vignet = QPushButton('Виньетка', self)
         self.make_vignet.setFixedSize(60, 20)
         self.make_vignet.clicked.connect(self.vignet)
+        self.fu_go_back = QPushButton('Cancel',self)
+        self.fu_go_back.setFixedSize(60, 20)
+        self.fu_go_back.clicked.connect(self.go_back)
 
+        self.edit_photo_control.addWidget(self.fu_go_back)
         self.edit_photo_control.addWidget(self.make_vignet)
         self.edit_photo_control.addWidget(self.ok)
 
@@ -85,16 +89,40 @@ class Win(QMainWindow):
 
         return self.main_layout
 
+    def go_back(self):
+        print(os.path.exists('sources\\'+self.image_list[self.index].split('\\')[-1] + ' @ Ctrl_Z.png'))
+        if os.path.exists('sources\\'+self.image_list[self.index].split('\\')[-1] + ' @ Ctrl_Z.png'):
+            im = Image.open('sources\\'+self.image_list[self.index].split('\\')[-1] + ' @ Ctrl_Z.png')
+            im.save(self.image_list[self.index])
+            # file = QPixmap(self.image_list[self.index])
+            # self.lbl_ph.setPixmap(self.file)
+
+
     def vignet(self):
         self.make_vignet.hide()
+        self.fu_go_back.hide()
         self.area.show()
         self.ok.show()
 
     def get_vignet_area(self):
-        self.area_val = float(self.area.text())
-        self.make_vig()
+        # try:
+            self.area_val = float(self.area.text())
+            self.make_vig()
+            self.ok.hide()
+            self.area.hide()
+            self.fu_go_back.show()
+            self.make_vignet.show()
+        # except:
+            self.ok.hide()
+            self.area.hide()
+            self.fu_go_back.show()
+            self.make_vignet.show()
+
 
     def make_vig(self):
+        im = Image.open(self.image_list[self.index])
+        im.save('sources\\'+self.image_list[self.index].split('\\')[-1] + ' @ Ctrl_Z.png')
+        im.close()
         im = Image.open(self.image_list[self.index])
         w, h = im.size
         vign_im = Image.new('RGBA', (w,h), color = (255,255,255,0))
@@ -109,8 +137,6 @@ class Win(QMainWindow):
         center_x = w // 2
         center_y = h // 2
         print(pixs)
-        cnt1 = 0
-        cnt2 = 0
         for x in range(w):
             for y in range(h):
                 distance = int(sqrt((x - center_x)**2 + (y - center_y)**2))
@@ -120,13 +146,16 @@ class Win(QMainWindow):
                     vign_pix[x,y] = (0, 0, 0, int(1000*change))
         # print(cnt1 / cnt2)
         # im.putdata(pixels)
-        vign_im.save('sec.png')
+        vign_im.save('vigs/sec.png')
         background = Image.open(self.image_list[self.index])
-        foreground = Image.open("sec.png")
+        foreground = Image.open("vigs/sec.png")
 
         background.paste(foreground, (0, 0), foreground)
-        background.save('see.png')
-
+        background.save(self.image_list[self.index])
+        self.lbl_ph.setPixmap(self.file)
+        im.close()
+        background.close()
+        foreground.close()
         print('done')
 
 
