@@ -1,26 +1,42 @@
-from PyQt5.QtWidgets import *
-from PyQt5.QtGui import *
 import sys
-import os
-import PyQt5.QtCore
-from PIL import Image
+from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QPushButton
 
-class Vignet(QMainWindow):
-    def __init__(self, image):
-        super().__init__()
-        self.index = 0
 
-        self.open_win()
+class Window1(QWidget):
+    def __init__(self):
+        super(Window1, self).__init__()
+        self.setWindowTitle('Window1')
+        self.setMinimumWidth(200)
+        self.setMinimumHeight(50)
+        self.button = QPushButton(self)
+        self.button.setText('Ok')
+        self.button.show()
 
-    def open_win(self):
-        self.setGeometry(400, 100, 100, 100)
-        self.setWindowTitle('Title')
-        control = self.vignet_settings()
-        main_widg = QWidget()
-        main_widg.setLayout(control)
-        self.setCentralWidget(main_widg)
 
-        self.show()
+class Window2(QWidget):
+    def __init__(self):
+        super(Window2, self).__init__()
+        self.setWindowTitle('Window2')
 
-    def vignet_settings(self):
 
+class MainWindow(QMainWindow):
+    def __init__(self):
+        super(MainWindow, self).__init__()
+        self.setWindowTitle('MainWindow')
+
+    def show_window_1(self):
+        self.w1 = Window1()
+        self.w1.button.clicked.connect(self.show_window_2)
+        self.w1.button.clicked.connect(self.w1.close)
+        self.w1.show()
+
+    def show_window_2(self):
+        self.w2 = Window2()
+        self.w2.show()
+
+if __name__ == '__main__':
+    app = QApplication(sys.argv)
+    w = MainWindow()
+    w.show()
+    w.show_window_1()
+    sys.exit(app.exec_())
