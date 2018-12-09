@@ -15,7 +15,7 @@ class Win(QMainWindow):
         self.open_win()
 
     def open_win(self):
-        self.setGeometry(400, 100, 720, 720)
+        self.setGeometry(400, 100, 720, 480)
         self.setWindowTitle('Title')
         control = self.contr()
         main_widg = QWidget()
@@ -27,11 +27,11 @@ class Win(QMainWindow):
     def contr(self):
         self.main_layout = QVBoxLayout()
         self.bottom_control = QHBoxLayout()
-        self.photo_area = QVBoxLayout()
+        self.photo_area = QHBoxLayout()
         self.top_control = QVBoxLayout()
+        self.edit_photo_control = QHBoxLayout()
 
         self.input = QLineEdit()
-        # self.input.setFixedSize(100,25)
 
         self.show_photo = QPushButton('Show')
         self.show_photo.clicked.connect(self.show_ph)
@@ -54,6 +54,13 @@ class Win(QMainWindow):
         self.bottom_control.addWidget(self.next_photo)
         self.bottom_control.addWidget(self.buaty_lbl2)
 
+        self.make_vignet = QPushButton('Виньетка', self)
+        self.make_vignet.setFixedSize(60,20)
+        self.make_vignet.clicked.connect(self.vignet)
+
+
+        self.edit_photo_control.addWidget(self.make_vignet)
+
         self.file = QPixmap('E:/Sources/Photoshop/cartoon/1_1.png')  # путь
         self.lbl = QLabel(self)
         self.lbl.setPixmap(self.file)
@@ -62,10 +69,16 @@ class Win(QMainWindow):
         self.photo_area.addWidget(self.lbl)
 
         self.main_layout.addLayout(self.top_control)
+        self.main_layout.addLayout(self.edit_photo_control)
         self.main_layout.addLayout(self.photo_area)
         self.main_layout.addLayout(self.bottom_control)
 
         return self.main_layout
+
+    def vignet(self):
+        im = Image.open(self.image_list[self.index])
+        size = im.size()
+        print(size)
 
     def show_ph(self):
         self.way = self.input.text()
@@ -122,24 +135,21 @@ class Win(QMainWindow):
             self.index += 1
         else:
             self.index = 0
-
+        im = Image.open(self.image_list[self.index])
         h = self.height()
         w = self.width()
-        im = Image.open(self.image_list[self.index])
-        im_h = im.size[0]
-        im_w = im.size[1]
-        im.close()
+        im_h = im.size[1]
+        im_w = im.size[0]
+        scale_coef = (h-135) / im_h
+        im_h = h-135
+        im_w *= scale_coef
+        if im_w > (w-25):
+            scale_coef = (w-25) / im_w
+            im_w = (w-25)
+            im_h *= scale_coef
+
         self.file = QPixmap(self.image_list[self.index])
-        n = h/(im_h)
-        h_2 = im_h * n
-        w_2 = im_w * n
-        h_3 = h_2 - (h_2 - 720)
-        part = h_2 / h_3
-        w_2 *= part
-        w_3 = w_2 - (h_2 - 720)
-        part = w_2/w_3
-        h_3 *= part
-        self.file = self.file.scaled(h_3,w_3)
+        self.file = self.file.scaled(int(im_w),int(im_h))
         self.lbl.setPixmap(self.file)
 
     def previous(self):
@@ -148,23 +158,21 @@ class Win(QMainWindow):
         else:
             self.index = 0
 
+        im = Image.open(self.image_list[self.index])
         h = self.height()
         w = self.width()
-        im = Image.open(self.image_list[self.index])
-        im_h = im.size[0]
-        im_w = im.size[1]
-        im.close()
+
+        im_h = im.size[1]
+        im_w = im.size[0]
+        scale_coef = (h-135) / im_h
+        im_h = h-135
+        im_w *= scale_coef
+        if im_w > (w-25):
+            scale_coef = (w-25) / im_w
+            im_w = (w-25)
+            im_h *= scale_coef
         self.file = QPixmap(self.image_list[self.index])
-        n = h / (im_h)
-        h_2 = im_h * n
-        w_2 = im_w * n
-        h_3 = h_2 - (h_2 - 720)
-        part = h_2 / h_3
-        w_2 *= part
-        w_3 = w_2 - (h_2 - 720)
-        part = w_2/w_3
-        h_3 *= part
-        self.file = self.file.scaled(h_3,w_3)
+        self.file = self.file.scaled(int(im_w),int(im_h))
         self.lbl.setPixmap(self.file)
 
 
