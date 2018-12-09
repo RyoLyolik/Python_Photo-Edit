@@ -58,19 +58,25 @@ class Win(QMainWindow):
 
         self.area = QLineEdit()
         self.area.move(100, 100)
+        self.opacity = QLineEdit()
+        self.color = QLineEdit()
         self.area.hide()
         self.ok = QPushButton('Ok', self)
-        self.ok.move(150, 50)
         self.ok.hide()
         self.ok.clicked.connect(self.get_vignet_area)
+        self.opacity.hide()
+        self.color.hide()
 
         self.make_vignet = QPushButton('Виньетка', self)
         self.make_vignet.setFixedSize(60, 20)
         self.make_vignet.clicked.connect(self.vignet)
-        self.fu_go_back = QPushButton('Cancel',self)
+        self.fu_go_back = QPushButton('Cancel', self)
         self.fu_go_back.setFixedSize(60, 20)
         self.fu_go_back.clicked.connect(self.go_back)
 
+        self.edit_photo_control.addWidget(self.area)
+        self.edit_photo_control.addWidget(self.opacity)
+        self.edit_photo_control.addWidget(self.color)
         self.edit_photo_control.addWidget(self.fu_go_back)
         self.edit_photo_control.addWidget(self.make_vignet)
         self.edit_photo_control.addWidget(self.ok)
@@ -90,62 +96,62 @@ class Win(QMainWindow):
         return self.main_layout
 
     def go_back(self):
-        print(os.path.exists('sources\\'+self.image_list[self.index].split('\\')[-1] + ' @ Ctrl_Z.png'))
-        if os.path.exists('sources\\'+self.image_list[self.index].split('\\')[-1] + ' @ Ctrl_Z.png'):
-            im = Image.open('sources\\'+self.image_list[self.index].split('\\')[-1] + ' @ Ctrl_Z.png')
+        print(os.path.exists('sources\\' + self.image_list[self.index].split('\\')[-1] + ' @ Ctrl_Z.png'))
+        if os.path.exists('sources\\' + self.image_list[self.index].split('\\')[-1] + ' @ Ctrl_Z.png'):
+            im = Image.open('sources\\' + self.image_list[self.index].split('\\')[-1] + ' @ Ctrl_Z.png')
             im.save(self.image_list[self.index])
-            # file = QPixmap(self.image_list[self.index])
-            # self.lbl_ph.setPixmap(self.file)
-
 
     def vignet(self):
         self.make_vignet.hide()
         self.fu_go_back.hide()
         self.area.show()
         self.ok.show()
+        self.opacity.show()
+        self.color.show()
 
     def get_vignet_area(self):
-        # try:
+        try:
             self.area_val = float(self.area.text())
             self.make_vig()
             self.ok.hide()
             self.area.hide()
+            self.opacity.hide()
+            self.color.hide()
             self.fu_go_back.show()
             self.make_vignet.show()
-        # except:
+        except:
             self.ok.hide()
             self.area.hide()
+            self.opacity.hide()
+            self.color.hide()
             self.fu_go_back.show()
             self.make_vignet.show()
 
-
     def make_vig(self):
+        opacity = float(self.opacity.text())
+        r, g, b = int(self.color.text().split()[0]), int(self.color.text().split()[1]), int(
+            self.color.text().split()[2])
+        print(r, g, b)
         im = Image.open(self.image_list[self.index])
-        im.save('sources\\'+self.image_list[self.index].split('\\')[-1] + ' @ Ctrl_Z.png')
+        im.save('sources\\' + self.image_list[self.index].split('\\')[-1] + ' @ Ctrl_Z.png')
         im.close()
         im = Image.open(self.image_list[self.index])
         w, h = im.size
-        vign_im = Image.new('RGBA', (w,h), color = (255,255,255,0))
+        vign_im = Image.new('RGBA', (w, h), color=(255, 255, 255, 0))
         vign_pix = vign_im.load()
         pixs = im.load()
         area = w * h
         vignet_area = area * self.area_val / 100
         not_vignet_area = area - vignet_area
-        r = int(sqrt(not_vignet_area/pi))
-        print(r)
-        print(pi* r **2/area)
+        r = int(sqrt(not_vignet_area / pi))
         center_x = w // 2
         center_y = h // 2
-        print(pixs)
         for x in range(w):
             for y in range(h):
-                distance = int(sqrt((x - center_x)**2 + (y - center_y)**2))
+                distance = int(sqrt((x - center_x) ** 2 + (y - center_y) ** 2))
                 if distance > r:
-                    change = (distance - r) / int(sqrt(center_x**2 + center_y**2))
-                    # print(change,pixels[x*y])
-                    vign_pix[x,y] = (0, 0, 0, int(1000*change))
-        # print(cnt1 / cnt2)
-        # im.putdata(pixels)
+                    change = (distance - r) / int(sqrt(center_x ** 2 + center_y ** 2))
+                    vign_pix[x, y] = r, g, b, int(1000 * change * opacity)
         vign_im.save('vigs/sec.png')
         background = Image.open(self.image_list[self.index])
         foreground = Image.open("vigs/sec.png")
@@ -157,7 +163,6 @@ class Win(QMainWindow):
         background.close()
         foreground.close()
         print('done')
-
 
     def show_ph(self):
         self.way = self.input.text()
@@ -195,7 +200,6 @@ class Win(QMainWindow):
             for currentdir, dirs, files in os.walk(folder):
                 files_1 = files
                 break
-        print('\\' in self.way)
         self.image_list = []
 
         for file in files_1:
@@ -234,11 +238,10 @@ class Win(QMainWindow):
         self.lbl_ph.setPixmap(self.file)
 
     def previous(self):
-        if abs(self.index) - len(self.image_list) < -1:
+        if abs(self.index) - len(self.image_list) <= -1:
             self.index -= 1
         else:
             self.index = 0
-
         im = Image.open(self.image_list[self.index])
         h = self.height()
         w = self.width()
