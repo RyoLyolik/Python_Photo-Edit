@@ -6,7 +6,6 @@ from PIL import Image
 from math import pi, sqrt
 from PyQt5.QtCore import *
 
-
 radius = 0
 
 
@@ -36,8 +35,6 @@ class Win(QMainWindow):
 
         self.input = QLineEdit()
 
-
-
         self.show_photo = QPushButton('Show')
         self.show_photo.clicked.connect(self.show_ph)
 
@@ -61,7 +58,6 @@ class Win(QMainWindow):
         self.zoom.valueChanged.connect(self.zooming)
         self.zoom.setValue(100)
         self.zoom_lbl = QLabel('100%')
-
 
         self.bottom_control.addWidget(self.buaty_lbl)
         self.bottom_control.addWidget(self.previous_photo)
@@ -107,7 +103,7 @@ class Win(QMainWindow):
         self.edit_photo_control.addWidget(self.ok)
 
         self.photo_scroll = QScrollArea()
-        self.photo_scroll.setFixedSize(750,450)
+        self.photo_scroll.setFixedSize(750, 450)
         self.file = QPixmap('E:/Sources/Photoshop/cartoon/1_1.png')  # путь
         self.lbl_ph = QLabel(self)
         self.lbl_ph.setPixmap(self.file)
@@ -130,16 +126,17 @@ class Win(QMainWindow):
 
             image.close()
             size = self.zoom.value() / 100
-            print((w*size) + 100, (h*size) + 100)
+            print((w * size) + 100, (h * size) + 100)
 
-            self.zoom_lbl.setText(str(int(size*100)) + '%')
+            self.zoom_lbl.setText(str(int(size * 100)) + '%')
             self.file = QPixmap(self.image_list[self.index])
-            self.file = self.file.scaled(w*size, h*size)
+            self.file = self.file.scaled(w * size, h * size)
             self.lbl_ph.setPixmap(self.file)
 
             self.photo_scroll.setWidget(self.lbl_ph)
         except IndexError:
             pass
+
     def go_back(self):
         print(os.path.exists('sources\\' + self.image_list[self.index].split('\\')[-1] + ' @ Ctrl_Z.png'))
         if os.path.exists('sources\\' + self.image_list[self.index].split('\\')[-1] + ' @ Ctrl_Z.png'):
@@ -296,7 +293,6 @@ class Win(QMainWindow):
         self.zoom_lbl.setText('100%')
         self.photo_scroll.setWidget(self.lbl_ph)
 
-
     def previous(self):
         if abs(self.index) - len(self.image_list) <= -1:
             self.index -= 1
@@ -319,7 +315,7 @@ class Win(QMainWindow):
         self.file = QPixmap(self.image_list[self.index])
         self.file = self.file.scaled(int(im_w), int(im_h))
         self.lbl_ph.setPixmap(self.file)
-        self.lbl_ph.setFixedSize(w,h)
+        self.lbl_ph.setFixedSize(w, h)
         self.zoom.setValue(100)
         self.zoom_lbl.setText('100%')
         self.photo_scroll.setWidget(self.lbl_ph)
