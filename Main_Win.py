@@ -97,17 +97,37 @@ class Win(QMainWindow):
     def make_vig(self):
         im = Image.open(self.image_list[self.index])
         w, h = im.size
-        pixels = im.load()
+        vign_im = Image.new('RGBA', (w,h), color = (255,255,255,0))
+        vign_pix = vign_im.load()
+        pixs = im.load()
         area = w * h
-        vignet_area = self.area_val * area / 100
+        vignet_area = area * self.area_val / 100
         not_vignet_area = area - vignet_area
         r = int(sqrt(not_vignet_area/pi))
         print(r)
+        print(pi* r **2/area)
         center_x = w // 2
         center_y = h // 2
+        print(pixs)
+        cnt1 = 0
+        cnt2 = 0
         for x in range(w):
             for y in range(h):
-                pass
+                distance = int(sqrt((x - center_x)**2 + (y - center_y)**2))
+                if distance > r:
+                    change = (distance - r) / int(sqrt(center_x**2 + center_y**2))
+                    # print(change,pixels[x*y])
+                    vign_pix[x,y] = (0, 0, 0, int(1000*change))
+        # print(cnt1 / cnt2)
+        # im.putdata(pixels)
+        vign_im.save('sec.png')
+        background = Image.open(self.image_list[self.index])
+        foreground = Image.open("sec.png")
+
+        background.paste(foreground, (0, 0), foreground)
+        background.save('see.png')
+
+        print('done')
 
 
     def show_ph(self):
