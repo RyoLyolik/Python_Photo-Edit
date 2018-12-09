@@ -2,9 +2,10 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 import sys
 import os
-import PyQt5.QtCore
 from PIL import Image
 from math import pi, sqrt
+from PyQt5.QtCore import *
+
 
 radius = 0
 
@@ -35,6 +36,8 @@ class Win(QMainWindow):
 
         self.input = QLineEdit()
 
+
+
         self.show_photo = QPushButton('Show')
         self.show_photo.clicked.connect(self.show_ph)
 
@@ -49,12 +52,22 @@ class Win(QMainWindow):
         self.buaty_lbl = QLabel('', self)
         self.buaty_lbl2 = QLabel('', self)
         self.buaty_lbl.setFixedSize(200, 1)
-        self.buaty_lbl2.setFixedSize(200, 1)
+        self.buaty_lbl2.setFixedSize(100, 1)
+
+        self.zoom = QSlider()
+        self.zoom.setOrientation(Qt.Horizontal)
+        self.zoom.setMaximum(1000)
+        self.zoom.setMinimum(0)
+        self.zoom.valueChanged.connect(self.zooming)
+        self.zoom_lbl = QLabel('100%')
+
 
         self.bottom_control.addWidget(self.buaty_lbl)
         self.bottom_control.addWidget(self.previous_photo)
         self.bottom_control.addWidget(self.next_photo)
         self.bottom_control.addWidget(self.buaty_lbl2)
+        self.bottom_control.addWidget(self.zoom)
+        self.bottom_control.addWidget(self.zoom_lbl)
 
         self.area = QLineEdit()
         self.area.move(100, 100)
@@ -67,6 +80,14 @@ class Win(QMainWindow):
         self.opacity.hide()
         self.color.hide()
 
+        self.area_lbl = QLabel('area, %', self)
+        self.opacity_lbl = QLabel('opacity, [0;1]', self)
+        self.color_lbl = QLabel('color, RGB', self)
+
+        self.area_lbl.hide()
+        self.opacity_lbl.hide()
+        self.color_lbl.hide()
+
         self.make_vignet = QPushButton('Виньетка', self)
         self.make_vignet.setFixedSize(60, 20)
         self.make_vignet.clicked.connect(self.vignet)
@@ -75,18 +96,23 @@ class Win(QMainWindow):
         self.fu_go_back.clicked.connect(self.go_back)
 
         self.edit_photo_control.addWidget(self.area)
+        self.edit_photo_control.addWidget(self.area_lbl)
         self.edit_photo_control.addWidget(self.opacity)
+        self.edit_photo_control.addWidget(self.opacity_lbl)
         self.edit_photo_control.addWidget(self.color)
+        self.edit_photo_control.addWidget(self.color_lbl)
         self.edit_photo_control.addWidget(self.fu_go_back)
         self.edit_photo_control.addWidget(self.make_vignet)
         self.edit_photo_control.addWidget(self.ok)
 
+        self.photo_scroll = QScrollArea()
         self.file = QPixmap('E:/Sources/Photoshop/cartoon/1_1.png')  # путь
         self.lbl_ph = QLabel(self)
         self.lbl_ph.setPixmap(self.file)
+        self.photo_scroll.setWidget(self.lbl_ph)
         # self.lbl_ph.move(5000, 5000)
 
-        self.photo_area.addWidget(self.lbl_ph)
+        self.photo_area.addWidget(self.photo_scroll)
 
         self.main_layout.addLayout(self.top_control)
         self.main_layout.addLayout(self.edit_photo_control)
@@ -95,6 +121,19 @@ class Win(QMainWindow):
 
         return self.main_layout
 
+    def zooming(self):
+        image = Image.open(self.image_list[self.index])
+        w, h = image.size
+
+        image.close()
+        size = self.zoom.value() / 100
+        print((w*size) + 100, (h*size) + 100)
+
+        self.zoom_lbl.setText(str(size) + '%')
+        self.file = QPixmap(self.image_list[self.index])
+        self.file = self.file.scaled(w*size, h*size)
+        self.lbl_ph.setPixmap(self.file)
+        self.resize((w * size) + 100, (h * size) + 100)
     def go_back(self):
         print(os.path.exists('sources\\' + self.image_list[self.index].split('\\')[-1] + ' @ Ctrl_Z.png'))
         if os.path.exists('sources\\' + self.image_list[self.index].split('\\')[-1] + ' @ Ctrl_Z.png'):
@@ -108,6 +147,9 @@ class Win(QMainWindow):
         self.ok.show()
         self.opacity.show()
         self.color.show()
+        self.area_lbl.show()
+        self.opacity_lbl.show()
+        self.color_lbl.show()
 
     def get_vignet_area(self):
         try:
@@ -117,9 +159,15 @@ class Win(QMainWindow):
             self.area.hide()
             self.opacity.hide()
             self.color.hide()
+            self.area_lbl.hide()
+            self.opacity_lbl.hide()
+            self.color_lbl.hide()
             self.fu_go_back.show()
             self.make_vignet.show()
         except:
+            self.area_lbl.hide()
+            self.opacity_lbl.hide()
+            self.color_lbl.hide()
             self.ok.hide()
             self.area.hide()
             self.opacity.hide()
@@ -232,7 +280,8 @@ class Win(QMainWindow):
             scale_coef = (w - 25) / im_w
             im_w = (w - 25)
             im_h *= scale_coef
-
+        self.im_w = im_w
+        self.im_h = im_h
         self.file = QPixmap(self.image_list[self.index])
         self.file = self.file.scaled(int(im_w), int(im_h))
         self.lbl_ph.setPixmap(self.file)
