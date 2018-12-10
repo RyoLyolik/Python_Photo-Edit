@@ -143,10 +143,11 @@ class Win(QMainWindow):
             self.photo_scroll.setWidget(self.lbl_ph)
 
     def go_back(self):
-        print(os.path.exists('sources\\' + self.image_list[self.index].split('\\')[-1] + ' @ Ctrl_Z.png'))
-        if os.path.exists('sources\\' + self.image_list[self.index].split('\\')[-1] + ' @ Ctrl_Z.png'):
-            im = Image.open('sources\\' + self.image_list[self.index].split('\\')[-1] + ' @ Ctrl_Z.png')
-            im.save(self.image_list[self.index])
+        if len(self.image_list) > 0:
+            print(os.path.exists('sources\\' + self.image_list[self.index].split('\\')[-1] + ' @ Ctrl_Z.png'))
+            if os.path.exists('sources\\' + self.image_list[self.index].split('\\')[-1] + ' @ Ctrl_Z.png'):
+                im = Image.open('sources\\' + self.image_list[self.index].split('\\')[-1] + ' @ Ctrl_Z.png')
+                im.save(self.image_list[self.index])
 
     def vignet(self):
         self.make_vignet.hide()
@@ -274,58 +275,60 @@ class Win(QMainWindow):
         self.zooming()
 
     def next(self):
-        if len(self.image_list) - self.index > 1:
-            self.index += 1
-        else:
-            self.index = 0
-        im = Image.open(self.image_list[self.index])
-        h = self.photo_scroll.height()
-        w = self.photo_scroll.width()
-        im_h = im.size[1]
-        im_w = im.size[0]
-        scale_coef = (h - 135) / im_h
-        im_h = h - 135
-        im_w *= scale_coef
-        if im_w > (w - 25):
-            scale_coef = (w - 25) / im_w
-            im_w = (w - 25)
-            im_h *= scale_coef
-        self.im_w = im_w
-        self.im_h = im_h
-        self.file = QPixmap(self.image_list[self.index])
-        self.file = self.file.scaled(int(im_w), int(im_h))
-        self.lbl_ph.setFixedSize(w, h)
-        self.lbl_ph.setPixmap(self.file)
-        self.zoom.setValue(100)
-        self.zoom_lbl.setText('100%')
-        self.photo_scroll.setWidget(self.lbl_ph)
+        if len(self.image_list) > 0:
+            if len(self.image_list) - self.index > 1:
+                self.index += 1
+            else:
+                self.index = 0
+            im = Image.open(self.image_list[self.index])
+            h = self.photo_scroll.height()
+            w = self.photo_scroll.width()
+            im_h = im.size[1]
+            im_w = im.size[0]
+            scale_coef = (h - 135) / im_h
+            im_h = h - 135
+            im_w *= scale_coef
+            if im_w > (w - 25):
+                scale_coef = (w - 25) / im_w
+                im_w = (w - 25)
+                im_h *= scale_coef
+            self.im_w = im_w
+            self.im_h = im_h
+            self.file = QPixmap(self.image_list[self.index])
+            self.file = self.file.scaled(int(im_w), int(im_h))
+            self.lbl_ph.setFixedSize(w, h)
+            self.lbl_ph.setPixmap(self.file)
+            self.zoom.setValue(100)
+            self.zoom_lbl.setText('100%')
+            self.photo_scroll.setWidget(self.lbl_ph)
 
     def previous(self):
-        if abs(self.index) - len(self.image_list) <= -1:
-            self.index -= 1
-        else:
-            self.index = 0
-        im = Image.open(self.image_list[self.index])
-        h = self.photo_scroll.height()
-        w = self.photo_scroll.width()
-        im_h = im.size[1]
-        im_w = im.size[0]
-        scale_coef = (h - 135) / im_h
-        im_h = h - 135
-        im_w *= scale_coef
-        if im_w > (w - 25):
-            scale_coef = (w - 25) / im_w
-            im_w = (w - 25)
-            im_h *= scale_coef
-        self.im_w = im_w
-        self.im_h = im_h
-        self.file = QPixmap(self.image_list[self.index])
-        self.file = self.file.scaled(int(im_w), int(im_h))
-        self.lbl_ph.setPixmap(self.file)
-        self.lbl_ph.setFixedSize(w, h)
-        self.zoom.setValue(100)
-        self.zoom_lbl.setText('100%')
-        self.photo_scroll.setWidget(self.lbl_ph)
+        if len(self.image_list) > 0:
+            if abs(self.index) - len(self.image_list) <= -1:
+                self.index -= 1
+            else:
+                self.index = 0
+            im = Image.open(self.image_list[self.index])
+            h = self.photo_scroll.height()
+            w = self.photo_scroll.width()
+            im_h = im.size[1]
+            im_w = im.size[0]
+            scale_coef = (h - 135) / im_h
+            im_h = h - 135
+            im_w *= scale_coef
+            if im_w > (w - 25):
+                scale_coef = (w - 25) / im_w
+                im_w = (w - 25)
+                im_h *= scale_coef
+            self.im_w = im_w
+            self.im_h = im_h
+            self.file = QPixmap(self.image_list[self.index])
+            self.file = self.file.scaled(int(im_w), int(im_h))
+            self.lbl_ph.setPixmap(self.file)
+            self.lbl_ph.setFixedSize(w, h)
+            self.zoom.setValue(100)
+            self.zoom_lbl.setText('100%')
+            self.photo_scroll.setWidget(self.lbl_ph)
 
 
 if __name__ == '__main__':
