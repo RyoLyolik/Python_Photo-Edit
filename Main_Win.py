@@ -70,6 +70,7 @@ class Win(QMainWindow):
         self.opacity_lbl.hide()
         self.color_lbl.hide()
 
+        self.info_lbl = QLabel('info', self)
         self.make_vignet = QPushButton('Виньетка', self)
         self.make_vignet.setFixedSize(60, 20)
         self.make_vignet.clicked.connect(self.vignet)
@@ -86,6 +87,7 @@ class Win(QMainWindow):
         self.edit_photo_control.addWidget(self.fu_go_back)
         self.edit_photo_control.addWidget(self.make_vignet)
         self.edit_photo_control.addWidget(self.ok)
+        self.edit_photo_control.addWidget(self.info_lbl)
 
         self.photo_scroll = QScrollArea()
         self.photo_scroll.setFixedSize(750, 450)
@@ -95,7 +97,7 @@ class Win(QMainWindow):
         self.photo_scroll.setWidget(self.lbl_ph)
         # self.lbl_ph.move(5000, 5000)
 
-        self.photo_area.addWidget(self.photo_scroll)
+        # self.photo_area.addWidget(self.photo_scroll)
 
         self.zoom = QSlider()
         self.zoom.setOrientation(Qt.Horizontal)
@@ -132,14 +134,13 @@ class Win(QMainWindow):
             image.close()
             size = self.zoom.value() / 100
             # print((w * size) + 100, (h * size) + 100)
-            self.photo_area.addWidget(self.photo_scroll)
             self.zoom_lbl.setText(str(int(size * 100)) + '%')
             self.file = QPixmap(self.image_list[self.index])
             self.file = self.file.scaled(w * size, h * size)
             self.lbl_ph = QLabel(self)
             self.lbl_ph.setPixmap(self.file)
-            self.photo_scroll.setWidget(self.lbl_ph)
-
+            self.photo_area.removeWidget(self.photo_scroll)
+            self.photo_area.addWidget(self.photo_scroll)
             self.photo_scroll.setWidget(self.lbl_ph)
 
     def go_back(self):
@@ -270,8 +271,11 @@ class Win(QMainWindow):
         except:
             self.index = 0
         print(self.image_list)
+        self.photo_area.removeWidget(self.photo_scroll)
         self.next()
+        self.photo_area.removeWidget(self.photo_scroll)
         self.previous()
+        self.photo_area.removeWidget(self.photo_scroll)
         self.zooming()
 
     def next(self):
@@ -301,6 +305,8 @@ class Win(QMainWindow):
             self.zoom.setValue(100)
             self.zoom_lbl.setText('100%')
             self.photo_scroll.setWidget(self.lbl_ph)
+            self.photo_area.removeWidget(self.photo_scroll)
+            self.info_lbl.setText(str(im.size) + ' ' + str(self.image_list[self.index].split('.')[-1]))
 
     def previous(self):
         if len(self.image_list) > 0:
@@ -329,6 +335,8 @@ class Win(QMainWindow):
             self.zoom.setValue(100)
             self.zoom_lbl.setText('100%')
             self.photo_scroll.setWidget(self.lbl_ph)
+            self.photo_area.removeWidget(self.photo_scroll)
+            self.info_lbl.setText(str(im.size) + ' ' + str(self.image_list[self.index].split('.')[-1]))
 
 
 if __name__ == '__main__':
