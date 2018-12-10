@@ -51,20 +51,7 @@ class Win(QMainWindow):
         self.buaty_lbl.setFixedSize(200, 1)
         self.buaty_lbl2.setFixedSize(100, 1)
 
-        self.zoom = QSlider()
-        self.zoom.setOrientation(Qt.Horizontal)
-        self.zoom.setMaximum(1000)
-        self.zoom.setMinimum(0)
-        self.zoom.valueChanged.connect(self.zooming)
-        self.zoom.setValue(100)
-        self.zoom_lbl = QLabel('100%')
 
-        self.bottom_control.addWidget(self.buaty_lbl)
-        self.bottom_control.addWidget(self.previous_photo)
-        self.bottom_control.addWidget(self.next_photo)
-        self.bottom_control.addWidget(self.buaty_lbl2)
-        self.bottom_control.addWidget(self.zoom)
-        self.bottom_control.addWidget(self.zoom_lbl)
 
         self.area = QLineEdit()
         self.area.move(100, 100)
@@ -112,6 +99,21 @@ class Win(QMainWindow):
 
         self.photo_area.addWidget(self.photo_scroll)
 
+        self.zoom = QSlider()
+        self.zoom.setOrientation(Qt.Horizontal)
+        self.zoom.setMaximum(1000)
+        self.zoom.setMinimum(0)
+        self.zoom.valueChanged.connect(self.zooming)
+        self.zoom.setValue(100)
+        self.zoom_lbl = QLabel('100%')
+
+        self.bottom_control.addWidget(self.buaty_lbl)
+        self.bottom_control.addWidget(self.previous_photo)
+        self.bottom_control.addWidget(self.next_photo)
+        self.bottom_control.addWidget(self.buaty_lbl2)
+        self.bottom_control.addWidget(self.zoom)
+        self.bottom_control.addWidget(self.zoom_lbl)
+
         self.main_layout.addLayout(self.top_control)
         self.main_layout.addLayout(self.edit_photo_control)
         self.main_layout.addLayout(self.photo_area)
@@ -121,19 +123,26 @@ class Win(QMainWindow):
 
     def zooming(self):
         try:
+            self.photo_area.removeWidget(self.photo_scroll)
+            self.photo_scroll = QScrollArea()
+            # self.photo_area.removeWidget(self.photo_scroll)
+            self.photo_scroll.setFixedSize(750, 450)
             image = Image.open(self.image_list[self.index])
             w, h = self.im_w, self.im_h
 
             image.close()
             size = self.zoom.value() / 100
             print((w * size) + 100, (h * size) + 100)
-
+            self.photo_area.addWidget(self.photo_scroll)
             self.zoom_lbl.setText(str(int(size * 100)) + '%')
             self.file = QPixmap(self.image_list[self.index])
             self.file = self.file.scaled(w * size, h * size)
+            self.lbl_ph = QLabel(self)
             self.lbl_ph.setPixmap(self.file)
+            self.photo_scroll.setWidget(self.lbl_ph)
 
             self.photo_scroll.setWidget(self.lbl_ph)
+
         except IndexError:
             pass
 
@@ -265,6 +274,7 @@ class Win(QMainWindow):
         print(self.image_list)
         self.next()
         self.previous()
+        self.zooming()
 
     def next(self):
         if len(self.image_list) - self.index > 1:
