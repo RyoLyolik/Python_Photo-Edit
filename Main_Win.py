@@ -51,8 +51,6 @@ class Win(QMainWindow):
         self.buaty_lbl.setFixedSize(200, 1)
         self.buaty_lbl2.setFixedSize(100, 1)
 
-
-
         self.area = QLineEdit()
         self.area.move(100, 100)
         self.opacity = QLineEdit()
@@ -122,7 +120,8 @@ class Win(QMainWindow):
         return self.main_layout
 
     def zooming(self):
-        try:
+        if len(self.image_list) > 0:
+            print(self.image_list[self.index])
             self.photo_area.removeWidget(self.photo_scroll)
             self.photo_scroll = QScrollArea()
             # self.photo_area.removeWidget(self.photo_scroll)
@@ -132,7 +131,7 @@ class Win(QMainWindow):
 
             image.close()
             size = self.zoom.value() / 100
-            print((w * size) + 100, (h * size) + 100)
+            # print((w * size) + 100, (h * size) + 100)
             self.photo_area.addWidget(self.photo_scroll)
             self.zoom_lbl.setText(str(int(size * 100)) + '%')
             self.file = QPixmap(self.image_list[self.index])
@@ -142,9 +141,6 @@ class Win(QMainWindow):
             self.photo_scroll.setWidget(self.lbl_ph)
 
             self.photo_scroll.setWidget(self.lbl_ph)
-
-        except IndexError:
-            pass
 
     def go_back(self):
         print(os.path.exists('sources\\' + self.image_list[self.index].split('\\')[-1] + ' @ Ctrl_Z.png'))
@@ -225,6 +221,7 @@ class Win(QMainWindow):
         print('done')
 
     def show_ph(self):
+        self.zoom.setValue(100)
         self.way = self.input.text()
         self.file = QPixmap(self.way)
         self.lbl_ph.setPixmap(self.file)
