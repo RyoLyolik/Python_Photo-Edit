@@ -218,7 +218,6 @@ class Win(QMainWindow):
         self.done_button.hide()
         self.buaty_label.show()
         self.buaty_label2.show()
-        self.ok.show()
         self.make_vignet.show()
         self.fu_go_back.show()
         self.show_photo.show()
@@ -226,6 +225,8 @@ class Win(QMainWindow):
         self.previous_photo.show()
         self.input.show()
         self.image = QImage(self.width(), self.height(), QImage.Format_ARGB32)
+        self.rect = False
+        self.ellipse = False
 
     def mouseMoveEvent(self, Event):
         # print(Event.pos())
@@ -329,9 +330,9 @@ class Win(QMainWindow):
 
     def make_vig(self):
         opacity = float(self.opacity.text())
-        r, g, b = int(self.color.text().split()[0]), int(self.color.text().split()[1]), int(
+        red, g, b = int(self.color.text().split()[0]), int(self.color.text().split()[1]), int(
             self.color.text().split()[2])
-        print(r, g, b)
+        print(red, g, b)
         im = Image.open(self.image_list[self.index])
         im.save('sources\\' + self.image_list[self.index].split('\\')[-1] + ' @ Ctrl_Z.png')
         im.close()
@@ -351,7 +352,7 @@ class Win(QMainWindow):
                 distance = int(sqrt((x - center_x) ** 2 + (y - center_y) ** 2))
                 if distance > r:
                     change = (distance - r) / int(sqrt(center_x ** 2 + center_y ** 2))
-                    vign_pix[x, y] = r, g, b, int(1000 * change * opacity)
+                    vign_pix[x, y] = (red, g, b, int(1000 * change * opacity))
         vign_im.save('vigs/sec.png')
         background = Image.open(self.image_list[self.index])
         foreground = Image.open("vigs/sec.png")
