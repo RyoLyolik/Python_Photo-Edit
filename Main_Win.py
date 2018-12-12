@@ -5,6 +5,7 @@ import os
 from PIL import Image
 from math import pi, sqrt
 from PyQt5.QtCore import *
+import random
 
 radius = 0
 
@@ -24,6 +25,12 @@ class Win(QMainWindow):
         main_widg.setLayout(control)
         self.setCentralWidget(main_widg)
 
+        menubar = self.menuBar()
+        filemenu = menubar.addMenu('File')
+        filemenu.addAction(self.new_file())
+        self.rect = False
+        self.ellipse = False
+        # self.test()
         self.show()
 
     def contr(self):
@@ -46,10 +53,15 @@ class Win(QMainWindow):
         self.next_photo.clicked.connect(self.next)
         self.previous_photo.clicked.connect(self.previous)
 
-        self.buaty_lbl = QLabel('', self)
-        self.buaty_lbl2 = QLabel('', self)
-        self.buaty_lbl.setFixedSize(200, 1)
-        self.buaty_lbl2.setFixedSize(100, 1)
+        self.buaty_label = QLabel('', self)
+        self.buaty_label2 = QLabel('', self)
+        self.buaty_label.setFixedSize(200, 1)
+        self.buaty_label2.setFixedSize(100, 1)
+
+        self.bottom_control.addWidget(self.buaty_label)
+        self.bottom_control.addWidget(self.previous_photo)
+        self.bottom_control.addWidget(self.next_photo)
+        self.bottom_control.addWidget(self.buaty_label2)
 
         self.area = QLineEdit()
         self.area.move(100, 100)
@@ -62,15 +74,14 @@ class Win(QMainWindow):
         self.opacity.hide()
         self.color.hide()
 
-        self.area_lbl = QLabel('area, %', self)
-        self.opacity_lbl = QLabel('opacity, [0;1]', self)
-        self.color_lbl = QLabel('color, RGB', self)
+        self.area_label = QLabel('area, %', self)
+        self.opacity_label = QLabel('opacity, [0;1]', self)
+        self.color_label = QLabel('color, RGB', self)
 
-        self.area_lbl.hide()
-        self.opacity_lbl.hide()
-        self.color_lbl.hide()
+        self.area_label.hide()
+        self.opacity_label.hide()
+        self.color_label.hide()
 
-        self.info_lbl = QLabel('info', self)
         self.make_vignet = QPushButton('Виньетка', self)
         self.make_vignet.setFixedSize(60, 20)
         self.make_vignet.clicked.connect(self.vignet)
@@ -78,41 +89,48 @@ class Win(QMainWindow):
         self.fu_go_back.setFixedSize(60, 20)
         self.fu_go_back.clicked.connect(self.go_back)
 
+        self.radio_button_1 = QRadioButton('modern art')
+        self.radio_button_1.setFixedSize(100, 15)
+        self.radio_button_2 = QRadioButton('Usually drawing')
+        self.radio_button_2.setFixedSize(100, 15)
+
+        self.ch_color = QPushButton(self)
+        self.ch_color.move(20, 40)
+        self.ch_color.setText("Choice color")
+        self.ch_color.clicked.connect(self.choose_color)
+        self.color_chose = "black"
+
+        self.button_ellipse = QPushButton('ellipse')
+        self.button_ellipse.setFixedSize(100, 25)
+        self.button_rect = QPushButton('rect')
+        self.button_rect.setFixedSize(100, 25)
+
+        self.check_random = QCheckBox('Random')
+
+        self.button_ellipse.clicked.connect(self.change)
+        self.button_rect.clicked.connect(self.change_2)
+
+        self.edit_photo_control.addWidget(self.check_random)
+        self.edit_photo_control.addWidget(self.ch_color)
+        self.edit_photo_control.addWidget(self.button_ellipse)
+        self.edit_photo_control.addWidget(self.button_rect)
+        self.edit_photo_control.addWidget(self.radio_button_1)
+        self.edit_photo_control.addWidget(self.radio_button_2)
         self.edit_photo_control.addWidget(self.area)
-        self.edit_photo_control.addWidget(self.area_lbl)
+        self.edit_photo_control.addWidget(self.area_label)
         self.edit_photo_control.addWidget(self.opacity)
-        self.edit_photo_control.addWidget(self.opacity_lbl)
+        self.edit_photo_control.addWidget(self.opacity_label)
         self.edit_photo_control.addWidget(self.color)
-        self.edit_photo_control.addWidget(self.color_lbl)
+        self.edit_photo_control.addWidget(self.color_label)
         self.edit_photo_control.addWidget(self.fu_go_back)
         self.edit_photo_control.addWidget(self.make_vignet)
         self.edit_photo_control.addWidget(self.ok)
-        self.edit_photo_control.addWidget(self.info_lbl)
 
-        self.photo_scroll = QScrollArea()
-        self.photo_scroll.setFixedSize(750, 450)
-        self.file = QPixmap('E:/Sources/Photoshop/cartoon/1_1.png')  # путь
-        self.lbl_ph = QLabel(self)
-        self.lbl_ph.setPixmap(self.file)
-        self.photo_scroll.setWidget(self.lbl_ph)
-        # self.lbl_ph.move(5000, 5000)
+        self.file = QPixmap('')
+        self.label_photo = QLabel(self)
+        self.label_photo.setPixmap(self.file)
 
-        # self.photo_area.addWidget(self.photo_scroll)
-
-        self.zoom = QSlider()
-        self.zoom.setOrientation(Qt.Horizontal)
-        self.zoom.setMaximum(1000)
-        self.zoom.setMinimum(0)
-        self.zoom.valueChanged.connect(self.zooming)
-        self.zoom.setValue(100)
-        self.zoom_lbl = QLabel('100%')
-
-        self.bottom_control.addWidget(self.buaty_lbl)
-        self.bottom_control.addWidget(self.previous_photo)
-        self.bottom_control.addWidget(self.next_photo)
-        self.bottom_control.addWidget(self.buaty_lbl2)
-        self.bottom_control.addWidget(self.zoom)
-        self.bottom_control.addWidget(self.zoom_lbl)
+        self.photo_area.addWidget(self.label_photo)
 
         self.main_layout.addLayout(self.top_control)
         self.main_layout.addLayout(self.edit_photo_control)
@@ -121,34 +139,158 @@ class Win(QMainWindow):
 
         return self.main_layout
 
-    def zooming(self):
-        if len(self.image_list) > 0:
-            print(self.image_list[self.index])
-            self.photo_area.removeWidget(self.photo_scroll)
-            self.photo_scroll = QScrollArea()
-            # self.photo_area.removeWidget(self.photo_scroll)
-            self.photo_scroll.setFixedSize(750, 450)
-            image = Image.open(self.image_list[self.index])
-            w, h = self.im_w, self.im_h
+    def change(self):
+        self.ellipse = True
+        self.rect = False
 
-            image.close()
-            size = self.zoom.value() / 100
-            # print((w * size) + 100, (h * size) + 100)
-            self.zoom_lbl.setText(str(int(size * 100)) + '%')
-            self.file = QPixmap(self.image_list[self.index])
-            self.file = self.file.scaled(w * size, h * size)
-            self.lbl_ph = QLabel(self)
-            self.lbl_ph.setPixmap(self.file)
-            self.photo_area.removeWidget(self.photo_scroll)
-            self.photo_area.addWidget(self.photo_scroll)
-            self.photo_scroll.setWidget(self.lbl_ph)
+    def change_2(self):
+        self.rect = True
+        self.ellipse = False
+
+    def new_file(self):
+        new_file = QAction('New file', self)
+        new_file.setStatusTip('new_file')
+        new_file.triggered.connect(self.make_file)
+        return new_file
+
+    def make_file(self):
+        try:
+            self.slider.hide()
+        except:
+            pass
+        self.buaty_label.hide()
+        self.buaty_label2.hide()
+        self.ok.hide()
+        self.make_vignet.hide()
+        self.fu_go_back.hide()
+        self.area.hide()
+        self.area_label.hide()
+        self.opacity.hide()
+        self.show_photo.hide()
+        self.next_photo.hide()
+        self.previous_photo.hide()
+        self.input.hide()
+        self.opacity_label.hide()
+        self.color.hide()
+        self.opacity_label.hide()
+        self.color_label.hide()
+        self.make_field()
+        self.done_button = QPushButton('Done')
+        self.done_button.clicked.connect(self.done)
+        self.edit_photo_control.addWidget(self.done_button)
+        self.slider = QSlider()
+        self.slider.setMaximum(100)
+        self.slider.setMinimum(1)
+        self.slider.setValue(5)
+        self.slider.setOrientation(Qt.Horizontal)
+        self.slider.setFixedSize(100, 10)
+        self.slider.move(self.height(), self.width() / 2)
+        self.main_layout.addWidget(self.slider)
+
+    def choose_color(self):
+        color = QColorDialog.getColor()
+        if color.isValid():
+            self.color_chose = color
+
+    def make_field(self):
+        #     pass
+        self.file = QPixmap('')
+        self.label_photo.setPixmap(self.file)
+        self.image = QImage(self.width(), self.height(), QImage.Format_ARGB32)
+
+    def mousePressEvent(self, Event):
+        try:
+            if self.radio_button_1.isChecked():
+                self.modern_art(Event)
+            elif self.radio_button_2.isChecked():
+                self.draw_usually(Event)
+        except:
+            pass
+
+    def paintEvent(self, Event):
+        paint = QPainter(self)
+        try:
+            paint.drawImage(0, 0, self.image)
+        except:
+            pass
+
+    def done(self):
+        self.done_button.hide()
+        self.buaty_label.show()
+        self.buaty_label2.show()
+        self.ok.show()
+        self.make_vignet.show()
+        self.fu_go_back.show()
+        self.show_photo.show()
+        self.next_photo.show()
+        self.previous_photo.show()
+        self.input.show()
+        self.image = QImage(self.width(), self.height(), QImage.Format_ARGB32)
+
+    def mouseMoveEvent(self, Event):
+        # print(Event.pos())
+        if self.radio_button_1.isChecked():
+            self.modern_art(Event)
+        elif self.radio_button_2.isChecked():
+            self.draw_usually(Event)
+
+    def modern_art(self, Event):
+        try:
+            self.paint = QPainter(self.image)
+            self.paint.setBrush(
+                QColor(random.choice(range(0, 256)), random.choice(range(0, 256)), random.choice(range(0, 256))))
+            print(self.rect)
+            if self.ellipse:
+                if self.check_random.isChecked():
+                    self.paint.drawEllipse(random.choice(range(0, self.width())),
+                                           random.choice(range(0, self.height())),
+                                           random.choice(range(0, self.width())),
+                                           random.choice(range(0, self.height())))
+                else:
+                    self.paint.drawEllipse(int(str(Event.pos())[20:-1].split(', ')[0]),
+                                           int(str(Event.pos())[20:-1].split(', ')[1]),
+                                           int(str(Event.pos())[20:-1].split(', ')[0]) * self.slider.value() / 10,
+                                           int(str(Event.pos())[20:-1].split(', ')[1]) * self.slider.value() / 10)
+            elif self.rect:
+                if self.check_random.isChecked():
+                    points = QPolygon(
+                        [QPoint(random.choice(range(0, self.width())), random.choice(range(0, self.height()))),
+                         QPoint(random.choice(range(0, self.width())), random.choice(range(0, self.height()))),
+                         QPoint(random.choice(range(0, self.width())), random.choice(range(0, self.height()))),
+                         QPoint(random.choice(range(0, self.width())), random.choice(range(0, self.height())))])
+                    self.paint.drawPolygon(points)
+                else:
+                    self.paint.drawRect(int(str(Event.pos())[20:-1].split(', ')[0]),
+                                        int(str(Event.pos())[20:-1].split(', ')[1]),
+                                        int(str(Event.pos())[20:-1].split(', ')[0]) * self.slider.value() / 10,
+                                        int(str(Event.pos())[20:-1].split(', ')[1]) * self.slider.value() / 10)
+                    print(random.choice(range(0, self.width())), random.choice(range(0, self.height())), 1, 1, 1, 1, 1)
+
+            self.update()
+        except:
+            pass
+
+    def draw_usually(self, Event):
+        try:
+            self.paint = QPainter(self.image)
+            self.paint.setBrush(QColor(self.color_chose))
+            if self.ellipse:
+                self.paint.drawEllipse(int(str(Event.pos())[20:-1].split(', ')[0]),
+                                       int(str(Event.pos())[20:-1].split(', ')[1]), self.slider.value(),
+                                       self.slider.value())
+            elif self.rect:
+                self.paint.drawRect(int(str(Event.pos())[20:-1].split(', ')[0]),
+                                    int(str(Event.pos())[20:-1].split(', ')[1]), self.slider.value(),
+                                    self.slider.value())
+            self.update()
+        except:
+            pass
 
     def go_back(self):
-        if len(self.image_list) > 0:
-            print(os.path.exists('sources\\' + self.image_list[self.index].split('\\')[-1] + ' @ Ctrl_Z.png'))
-            if os.path.exists('sources\\' + self.image_list[self.index].split('\\')[-1] + ' @ Ctrl_Z.png'):
-                im = Image.open('sources\\' + self.image_list[self.index].split('\\')[-1] + ' @ Ctrl_Z.png')
-                im.save(self.image_list[self.index])
+        print(os.path.exists('sources\\' + self.image_list[self.index].split('\\')[-1] + ' @ Ctrl_Z.png'))
+        if os.path.exists('sources\\' + self.image_list[self.index].split('\\')[-1] + ' @ Ctrl_Z.png'):
+            im = Image.open('sources\\' + self.image_list[self.index].split('\\')[-1] + ' @ Ctrl_Z.png')
+            im.save(self.image_list[self.index])
 
     def vignet(self):
         self.make_vignet.hide()
@@ -157,9 +299,9 @@ class Win(QMainWindow):
         self.ok.show()
         self.opacity.show()
         self.color.show()
-        self.area_lbl.show()
-        self.opacity_lbl.show()
-        self.color_lbl.show()
+        self.area_label.show()
+        self.opacity_label.show()
+        self.color_label.show()
 
     def get_vignet_area(self):
         try:
@@ -169,15 +311,15 @@ class Win(QMainWindow):
             self.area.hide()
             self.opacity.hide()
             self.color.hide()
-            self.area_lbl.hide()
-            self.opacity_lbl.hide()
-            self.color_lbl.hide()
+            self.area_label.hide()
+            self.opacity_label.hide()
+            self.color_label.hide()
             self.fu_go_back.show()
             self.make_vignet.show()
         except:
-            self.area_lbl.hide()
-            self.opacity_lbl.hide()
-            self.color_lbl.hide()
+            self.area_label.hide()
+            self.opacity_label.hide()
+            self.color_label.hide()
             self.ok.hide()
             self.area.hide()
             self.opacity.hide()
@@ -216,17 +358,16 @@ class Win(QMainWindow):
 
         background.paste(foreground, (0, 0), foreground)
         background.save(self.image_list[self.index])
-        self.lbl_ph.setPixmap(self.file)
+        self.label_photo.setPixmap(self.file)
         im.close()
         background.close()
         foreground.close()
         print('done')
 
     def show_ph(self):
-        self.zoom.setValue(100)
         self.way = self.input.text()
         self.file = QPixmap(self.way)
-        self.lbl_ph.setPixmap(self.file)
+        self.label_photo.setPixmap(self.file)
         if '/' not in self.way and "\\" not in self.way:
             folder = os.getcwd()
             for currentdir, dirs, files in os.walk(folder):
@@ -271,72 +412,53 @@ class Win(QMainWindow):
         except:
             self.index = 0
         print(self.image_list)
-        self.photo_area.removeWidget(self.photo_scroll)
         self.next()
-        self.photo_area.removeWidget(self.photo_scroll)
         self.previous()
-        self.photo_area.removeWidget(self.photo_scroll)
-        self.zooming()
 
     def next(self):
-        if len(self.image_list) > 0:
-            if len(self.image_list) - self.index > 1:
-                self.index += 1
-            else:
-                self.index = 0
-            im = Image.open(self.image_list[self.index])
-            h = self.photo_scroll.height()
-            w = self.photo_scroll.width()
-            im_h = im.size[1]
-            im_w = im.size[0]
-            scale_coef = (h - 135) / im_h
-            im_h = h - 135
-            im_w *= scale_coef
-            if im_w > (w - 25):
-                scale_coef = (w - 25) / im_w
-                im_w = (w - 25)
-                im_h *= scale_coef
-            self.im_w = im_w
-            self.im_h = im_h
-            self.file = QPixmap(self.image_list[self.index])
-            self.file = self.file.scaled(int(im_w), int(im_h))
-            self.lbl_ph.setFixedSize(w, h)
-            self.lbl_ph.setPixmap(self.file)
-            self.zoom.setValue(100)
-            self.zoom_lbl.setText('100%')
-            self.photo_scroll.setWidget(self.lbl_ph)
-            self.photo_area.removeWidget(self.photo_scroll)
-            self.info_lbl.setText(str(im.size) + ' ' + str(self.image_list[self.index].split('.')[-1]))
+        if len(self.image_list) - self.index > 1:
+            self.index += 1
+        else:
+            self.index = 0
+        im = Image.open(self.image_list[self.index])
+        h = self.height()
+        w = self.width()
+        im_h = im.size[1]
+        im_w = im.size[0]
+        scale_coef = (h - 170) / im_h
+        im_h = h - 170
+        im_w *= scale_coef
+        if im_w > (w - 25):
+            scale_coef = (w - 25) / im_w
+            im_w = (w - 25)
+            im_h *= scale_coef
+        self.im_w = im_w
+        self.im_h = im_h
+        self.file = QPixmap(self.image_list[self.index])
+        self.file = self.file.scaled(int(im_w), int(im_h))
+        self.label_photo.setPixmap(self.file)
 
     def previous(self):
-        if len(self.image_list) > 0:
-            if abs(self.index) - len(self.image_list) <= -1:
-                self.index -= 1
-            else:
-                self.index = 0
-            im = Image.open(self.image_list[self.index])
-            h = self.photo_scroll.height()
-            w = self.photo_scroll.width()
-            im_h = im.size[1]
-            im_w = im.size[0]
-            scale_coef = (h - 135) / im_h
-            im_h = h - 135
-            im_w *= scale_coef
-            if im_w > (w - 25):
-                scale_coef = (w - 25) / im_w
-                im_w = (w - 25)
-                im_h *= scale_coef
-            self.im_w = im_w
-            self.im_h = im_h
-            self.file = QPixmap(self.image_list[self.index])
-            self.file = self.file.scaled(int(im_w), int(im_h))
-            self.lbl_ph.setPixmap(self.file)
-            self.lbl_ph.setFixedSize(w, h)
-            self.zoom.setValue(100)
-            self.zoom_lbl.setText('100%')
-            self.photo_scroll.setWidget(self.lbl_ph)
-            self.photo_area.removeWidget(self.photo_scroll)
-            self.info_lbl.setText(str(im.size) + ' ' + str(self.image_list[self.index].split('.')[-1]))
+        if abs(self.index) - len(self.image_list) <= -1:
+            self.index -= 1
+        else:
+            self.index = 0
+        im = Image.open(self.image_list[self.index])
+        h = self.height()
+        w = self.width()
+
+        im_h = im.size[1]
+        im_w = im.size[0]
+        scale_coef = (h - 170) / im_h
+        im_h = h - 170
+        im_w *= scale_coef
+        if im_w > (w - 25):
+            scale_coef = (w - 25) / im_w
+            im_w = (w - 25)
+            im_h *= scale_coef
+        self.file = QPixmap(self.image_list[self.index])
+        self.file = self.file.scaled(int(im_w), int(im_h))
+        self.label_photo.setPixmap(self.file)
 
 
 if __name__ == '__main__':
