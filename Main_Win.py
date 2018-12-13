@@ -58,10 +58,13 @@ class Win(QMainWindow):
         self.buaty_label.setFixedSize(200, 1)
         self.buaty_label2.setFixedSize(100, 1)
 
+        self.info_label = QLabel('info', self)
+
         self.bottom_control.addWidget(self.buaty_label)
         self.bottom_control.addWidget(self.previous_photo)
         self.bottom_control.addWidget(self.next_photo)
         self.bottom_control.addWidget(self.buaty_label2)
+        self.bottom_control.addWidget(self.info_label)
 
         self.area = QLineEdit()
         self.area.move(100, 100)
@@ -402,64 +405,86 @@ class Win(QMainWindow):
                 files_1 = files
                 break
         self.image_list = []
-
+        self.names = []
         for file in files_1:
             extension = os.path.splitext(file)[1]
             if extension == '.png' or extension == '.jpg':
                 print(file)
+                self.names.append(file)
                 self.image_list.append(folder + '\\' + file)
         try:
-            self.index = self.image_list.index(str(folder) + '\\' + str(self.way))
+            self.index = self.image_list.index(self.way)
         except:
             self.index = 0
         print(self.image_list)
-        self.next()
-        self.previous()
+        try:
+            im = Image.open(self.image_list[self.index])
+            h = self.height()
+            w = self.width()
+            im_h = im.size[1]
+            im_w = im.size[0]
+            scale_coef = (h - 170) / im_h
+            im_h = h - 170
+            im_w *= scale_coef
+            if im_w > (w - 25):
+                scale_coef = (w - 25) / im_w
+                im_w = (w - 25)
+                im_h *= scale_coef
+            print(self.index)
+            self.file = QPixmap(self.image_list[self.index])
+            self.file = self.file.scaled(int(im_w), int(im_h))
+            self.label_photo.setPixmap(self.file)
+            self.info_label.setText(str(im.size)+' '+self.names[self.index])
+        except IndexError: pass
 
     def next(self):
-        if len(self.image_list) - self.index > 1:
-            self.index += 1
-        else:
-            self.index = 0
-        im = Image.open(self.image_list[self.index])
-        h = self.height()
-        w = self.width()
-        im_h = im.size[1]
-        im_w = im.size[0]
-        scale_coef = (h - 170) / im_h
-        im_h = h - 170
-        im_w *= scale_coef
-        if im_w > (w - 25):
-            scale_coef = (w - 25) / im_w
-            im_w = (w - 25)
-            im_h *= scale_coef
-        self.im_w = im_w
-        self.im_h = im_h
-        self.file = QPixmap(self.image_list[self.index])
-        self.file = self.file.scaled(int(im_w), int(im_h))
-        self.label_photo.setPixmap(self.file)
+        if len(self.image_list) != 0:
+            if len(self.image_list) - self.index > 1:
+                self.index += 1
+            else:
+                self.index = 0
+            im = Image.open(self.image_list[self.index])
+            h = self.height()
+            w = self.width()
+            im_h = im.size[1]
+            im_w = im.size[0]
+            scale_coef = (h - 170) / im_h
+            im_h = h - 170
+            im_w *= scale_coef
+            if im_w > (w - 25):
+                scale_coef = (w - 25) / im_w
+                im_w = (w - 25)
+                im_h *= scale_coef
+            self.im_w = im_w
+            self.im_h = im_h
+            self.file = QPixmap(self.image_list[self.index])
+            self.file = self.file.scaled(int(im_w), int(im_h))
+            self.label_photo.setPixmap(self.file)
+            self.info_label.setText(str(im.size) + ' ' + self.names[self.index])
 
     def previous(self):
-        if abs(self.index) - len(self.image_list) <= -1:
-            self.index -= 1
-        else:
-            self.index = 0
-        im = Image.open(self.image_list[self.index])
-        h = self.height()
-        w = self.width()
+        if len(self.image_list) != 0:
+            if abs(self.index) - len(self.image_list) <= -2:
+                self.index -= 1
+            else:
+                self.index = 0
+            im = Image.open(self.image_list[self.index])
+            h = self.height()
+            w = self.width()
 
-        im_h = im.size[1]
-        im_w = im.size[0]
-        scale_coef = (h - 170) / im_h
-        im_h = h - 170
-        im_w *= scale_coef
-        if im_w > (w - 25):
-            scale_coef = (w - 25) / im_w
-            im_w = (w - 25)
-            im_h *= scale_coef
-        self.file = QPixmap(self.image_list[self.index])
-        self.file = self.file.scaled(int(im_w), int(im_h))
-        self.label_photo.setPixmap(self.file)
+            im_h = im.size[1]
+            im_w = im.size[0]
+            scale_coef = (h - 170) / im_h
+            im_h = h - 170
+            im_w *= scale_coef
+            if im_w > (w - 25):
+                scale_coef = (w - 25) / im_w
+                im_w = (w - 25)
+                im_h *= scale_coef
+            self.file = QPixmap(self.image_list[self.index])
+            self.file = self.file.scaled(int(im_w), int(im_h))
+            self.label_photo.setPixmap(self.file)
+            self.info_label.setText(str(im.size) + ' ' + self.names[self.index])
 
 
 if __name__ == '__main__':
