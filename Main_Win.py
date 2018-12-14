@@ -332,7 +332,6 @@ class Win(QMainWindow):
         opacity = float(self.opacity.text())
         red, g, b = int(self.color.text().split()[0]), int(self.color.text().split()[1]), int(
             self.color.text().split()[2])
-        print(red, g, b)
         im = Image.open(self.image_list[self.index])
         im.save('sources\\' + self.image_list[self.index].split('\\')[-1] + ' @ Ctrl_Z.png')
         im.close()
