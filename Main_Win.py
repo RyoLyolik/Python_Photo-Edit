@@ -7,8 +7,6 @@ from math import pi, sqrt
 from PyQt5.QtCore import *
 import random
 
-radius = 0
-
 
 class Win(QMainWindow):
     def __init__(self):
@@ -16,40 +14,39 @@ class Win(QMainWindow):
         self.image_list = []
         self.index = 0
         self.open_win()
+        self.rect = False
+        self.ellipse = False
 
-    def open_win(self):
+    def open_win(self):  # Создание окна
         self.setGeometry(400, 100, 720, 480)
-        self.setWindowTitle('Title')
+        self.setWindowTitle('Photoshop V:1*10^-100')
         control = self.contr()
         main_widg = QWidget()
         main_widg.setLayout(control)
         self.setCentralWidget(main_widg)
 
-        menubar = self.menuBar()
+        menubar = self.menuBar()  # Меню бар
         filemenu = menubar.addMenu('File')
         filemenu.addAction(self.new_file())
-        self.rect = False
-        self.ellipse = False
-        # self.test()
         self.show()
 
-    def contr(self):
+    def contr(self):  # Размещение всех элементов управления
         self.main_layout = QVBoxLayout()
-        self.bottom_control = QHBoxLayout()
-        self.photo_area = QHBoxLayout()
-        self.top_control = QVBoxLayout()
-        self.edit_photo_control = QHBoxLayout()
+        self.bottom_control = QHBoxLayout()  # Нижнее управление
+        self.photo_area = QHBoxLayout()  # Территория для фото
+        self.top_control = QVBoxLayout()  # Верхнее управление
+        self.edit_photo_control = QHBoxLayout()  # Лайаут для редактирования фотографии
 
         self.input = QLineEdit()
 
-        self.show_photo = QPushButton('Show')
+        self.show_photo = QPushButton('Показать')
         self.show_photo.clicked.connect(self.show_ph)
 
         self.top_control.addWidget(self.input)
         self.top_control.addWidget(self.show_photo)
 
-        self.next_photo = QPushButton('Next', self)
-        self.previous_photo = QPushButton('Previous', self)
+        self.next_photo = QPushButton('След', self)
+        self.previous_photo = QPushButton('Предыд', self)
         self.next_photo.clicked.connect(self.next)
         self.previous_photo.clicked.connect(self.previous)
 
@@ -58,7 +55,7 @@ class Win(QMainWindow):
         self.buaty_label.setFixedSize(200, 1)
         self.buaty_label2.setFixedSize(100, 1)
 
-        self.info_label = QLabel('info', self)
+        self.info_label = QLabel('Инфо', self)
 
         self.bottom_control.addWidget(self.buaty_label)
         self.bottom_control.addWidget(self.previous_photo)
@@ -77,9 +74,9 @@ class Win(QMainWindow):
         self.opacity.hide()
         self.color.hide()
 
-        self.area_label = QLabel('area, %', self)
-        self.opacity_label = QLabel('opacity, [0;1]', self)
-        self.color_label = QLabel('color, RGB', self)
+        self.area_label = QLabel('Площадь, %', self)
+        self.opacity_label = QLabel('Непрозрачность, [0;1]', self)
+        self.color_label = QLabel('Цвет, RGB', self)
 
         self.area_label.hide()
         self.opacity_label.hide()
@@ -88,27 +85,27 @@ class Win(QMainWindow):
         self.make_vignet = QPushButton('Виньетка', self)
         self.make_vignet.setFixedSize(60, 20)
         self.make_vignet.clicked.connect(self.vignet)
-        self.fu_go_back = QPushButton('Cancel', self)
+        self.fu_go_back = QPushButton('Отмена', self)
         self.fu_go_back.setFixedSize(60, 20)
         self.fu_go_back.clicked.connect(self.go_back)
 
-        self.radio_button_1 = QRadioButton('modern art')
+        self.radio_button_1 = QRadioButton('Стиль современного искусства')
         self.radio_button_1.setFixedSize(100, 15)
-        self.radio_button_2 = QRadioButton('Usually drawing')
+        self.radio_button_2 = QRadioButton('Обычное рисование')
         self.radio_button_2.setFixedSize(100, 15)
 
         self.ch_color = QPushButton(self)
         self.ch_color.move(20, 40)
-        self.ch_color.setText("Choice color")
+        self.ch_color.setText("Выбор цвета")
         self.ch_color.clicked.connect(self.choose_color)
         self.color_chose = "black"
 
-        self.button_ellipse = QPushButton('ellipse')
+        self.button_ellipse = QPushButton('Овал')
         self.button_ellipse.setFixedSize(100, 25)
-        self.button_rect = QPushButton('rect')
+        self.button_rect = QPushButton('Четырехугольник')
         self.button_rect.setFixedSize(100, 25)
 
-        self.check_random = QCheckBox('Random')
+        self.check_random = QCheckBox('Рандом')
 
         self.button_ellipse.clicked.connect(self.change)
         self.button_rect.clicked.connect(self.change_2)
@@ -142,24 +139,24 @@ class Win(QMainWindow):
 
         return self.main_layout
 
-    def change(self):
+    def change(self): # Кисть
         self.ellipse = True
         self.rect = False
 
-    def change_2(self):
+    def change_2(self): # Кисть
         self.rect = True
         self.ellipse = False
 
-    def new_file(self):
-        new_file = QAction('New file', self)
+    def new_file(self): # Часть менюбара.
+        new_file = QAction('Новый файл', self)
         new_file.setStatusTip('new_file')
         new_file.triggered.connect(self.make_file)
         return new_file
 
-    def make_file(self):
+    def make_file(self): #  Очистка окна для рисования
         try:
             self.slider.hide()
-        except:
+        except AttributeError:
             pass
         self.buaty_label.hide()
         self.buaty_label2.hide()
@@ -179,7 +176,7 @@ class Win(QMainWindow):
         self.info_label.hide()
         self.color_label.hide()
         self.make_field()
-        self.done_button = QPushButton('Done')
+        self.done_button = QPushButton('Готово')
         self.done_button.clicked.connect(self.done)
         self.edit_photo_control.addWidget(self.done_button)
         self.slider = QSlider()
@@ -191,18 +188,17 @@ class Win(QMainWindow):
         self.slider.move(self.height(), self.width() / 2)
         self.main_layout.addWidget(self.slider)
 
-    def choose_color(self):
+    def choose_color(self): #  Выбор цвета
         color = QColorDialog.getColor()
         if color.isValid():
             self.color_chose = color
 
-    def make_field(self):
-        #     pass
+    def make_field(self): #  Создание поля для рисования
         self.file = QPixmap('')
         self.label_photo.setPixmap(self.file)
         self.image = QImage(self.width(), self.height(), QImage.Format_ARGB32)
 
-    def mousePressEvent(self, Event):
+    def mousePressEvent(self, Event): # Проверка нажатия
         try:
             if self.radio_button_1.isChecked():
                 self.modern_art(Event)
@@ -211,14 +207,14 @@ class Win(QMainWindow):
         except:
             pass
 
-    def paintEvent(self, Event):
+    def paintEvent(self, Event): # Рисование
         paint = QPainter(self)
         try:
             paint.drawImage(0, 0, self.image)
-        except:
+        except AttributeError:
             pass
 
-    def done(self):
+    def done(self): #  Обратная установка кнопок, после нажатия на кнопку "Готово"
         self.done_button.hide()
         self.buaty_label.show()
         self.buaty_label2.show()
@@ -233,14 +229,13 @@ class Win(QMainWindow):
         self.rect = False
         self.ellipse = False
 
-    def mouseMoveEvent(self, Event):
-        # print(Event.pos())
+    def mouseMoveEvent(self, Event): #  Проверка вида рисования
         if self.radio_button_1.isChecked():
             self.modern_art(Event)
         elif self.radio_button_2.isChecked():
             self.draw_usually(Event)
 
-    def modern_art(self, Event):
+    def modern_art(self, Event): #  Рисование в стиле современного искусства
         try:
             self.paint = QPainter(self.image)
             self.paint.setBrush(
@@ -276,7 +271,7 @@ class Win(QMainWindow):
         except:
             pass
 
-    def draw_usually(self, Event):
+    def draw_usually(self, Event): #  Обычное рисование
         try:
             self.paint = QPainter(self.image)
             self.paint.setBrush(QColor(self.color_chose))
@@ -292,13 +287,13 @@ class Win(QMainWindow):
         except:
             pass
 
-    def go_back(self):
+    def go_back(self): #  Возврат фото к исходному состоянию
         print(os.path.exists('sources\\' + self.image_list[self.index].split('\\')[-1] + ' @ Ctrl_Z.png'))
         if os.path.exists('sources\\' + self.image_list[self.index].split('\\')[-1] + ' @ Ctrl_Z.png'):
             im = Image.open('sources\\' + self.image_list[self.index].split('\\')[-1] + ' @ Ctrl_Z.png')
             im.save(self.image_list[self.index])
 
-    def vignet(self):
+    def vignet(self): #  Показывание кнопок для настройки виньетки
         self.make_vignet.hide()
         self.fu_go_back.hide()
         self.area.show()
@@ -309,7 +304,7 @@ class Win(QMainWindow):
         self.opacity_label.show()
         self.color_label.show()
 
-    def get_vignet_area(self):
+    def get_vignet_area(self): #  Получание результатов настройк виньетирования
         try:
             self.area_val = float(self.area.text())
             self.make_vig()
@@ -322,7 +317,7 @@ class Win(QMainWindow):
             self.color_label.hide()
             self.fu_go_back.show()
             self.make_vignet.show()
-        except:
+        except ValueError:
             self.area_label.hide()
             self.opacity_label.hide()
             self.color_label.hide()
@@ -333,7 +328,7 @@ class Win(QMainWindow):
             self.fu_go_back.show()
             self.make_vignet.show()
 
-    def make_vig(self):
+    def make_vig(self): #  Само виньетирование
         opacity = float(self.opacity.text())
         red, g, b = int(self.color.text().split()[0]), int(self.color.text().split()[1]), int(
             self.color.text().split()[2])
@@ -370,7 +365,7 @@ class Win(QMainWindow):
         foreground.close()
         print('done')
 
-    def show_ph(self):
+    def show_ph(self): #  Показать фото
         self.way = self.input.text()
         self.file = QPixmap(self.way)
         self.label_photo.setPixmap(self.file)
@@ -384,8 +379,12 @@ class Win(QMainWindow):
                 fl = open(self.way, 'r')
                 fl.close()
                 folder = '/'.join(self.way.split('/')[:-1])
-            except:
-                folder = self.way
+            except PermissionError:
+                folder = ''
+            except FileNotFoundError:
+                folder = ''
+            except FileExistsError:
+                folder = ''
             for currentdir, dirs, files in os.walk(folder):
                 files_1 = files
                 break
@@ -395,8 +394,12 @@ class Win(QMainWindow):
                 fl = open(self.way, 'r')
                 fl.close()
                 folder = '\\'.join(self.way.split('\\')[:-1])
-            except:
-                folder = self.way
+            except PermissionError:
+                folder = ''
+            except FileNotFoundError:
+                folder = ''
+            except FileExistsError:
+                folder = ''
             for currentdir, dirs, files in os.walk(folder):
                 files_1 = files
                 break
@@ -415,10 +418,11 @@ class Win(QMainWindow):
                     print(file)
                     self.names.append(file)
                     self.image_list.append(folder + '\\' + file)
-        except UnboundLocalError: pass
+        except UnboundLocalError:
+            pass
         try:
             self.index = self.image_list.index(self.way)
-        except:
+        except ValueError:
             self.index = 0
         print(self.image_list)
         try:
@@ -438,11 +442,11 @@ class Win(QMainWindow):
             self.file = QPixmap(self.image_list[self.index])
             self.file = self.file.scaled(int(im_w), int(im_h))
             self.label_photo.setPixmap(self.file)
-            self.info_label.setText(str(im.size)+' '+self.names[self.index])
-        except IndexError: pass
+            self.info_label.setText(str(im.size) + ' ' + self.names[self.index])
+        except IndexError:
+            pass
 
-    def next(self):
-
+    def next(self): #  Следующее фото
         if len(self.image_list) != 0:
             if len(self.image_list) - self.index > 1:
                 self.index += 1
@@ -467,10 +471,9 @@ class Win(QMainWindow):
             self.label_photo.setPixmap(self.file)
             self.info_label.setText(str(im.size) + ' ' + self.names[self.index])
 
-    def previous(self):
-
+    def previous(self): #  Предыдущее фото
         if len(self.image_list) != 0:
-            if abs(self.index)-1 - len(self.image_list) <= -2:
+            if abs(self.index) - 1 - len(self.image_list) <= -2:
                 self.index -= 1
             else:
                 self.index = 0
