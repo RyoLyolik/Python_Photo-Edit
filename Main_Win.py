@@ -176,6 +176,7 @@ class Win(QMainWindow):
         self.opacity_label.hide()
         self.color.hide()
         self.opacity_label.hide()
+        self.info_label.hide()
         self.color_label.hide()
         self.make_field()
         self.done_button = QPushButton('Done')
@@ -225,6 +226,7 @@ class Win(QMainWindow):
         self.fu_go_back.show()
         self.show_photo.show()
         self.next_photo.show()
+        self.info_label.show()
         self.previous_photo.show()
         self.input.show()
         self.image = QImage(self.width(), self.height(), QImage.Format_ARGB32)
@@ -406,12 +408,14 @@ class Win(QMainWindow):
                 break
         self.image_list = []
         self.names = []
-        for file in files_1:
-            extension = os.path.splitext(file)[1]
-            if extension == '.png' or extension == '.jpg':
-                print(file)
-                self.names.append(file)
-                self.image_list.append(folder + '\\' + file)
+        try:
+            for file in files_1:
+                extension = os.path.splitext(file)[1]
+                if extension == '.png' or extension == '.jpg':
+                    print(file)
+                    self.names.append(file)
+                    self.image_list.append(folder + '\\' + file)
+        except UnboundLocalError: pass
         try:
             self.index = self.image_list.index(self.way)
         except:
@@ -438,6 +442,7 @@ class Win(QMainWindow):
         except IndexError: pass
 
     def next(self):
+
         if len(self.image_list) != 0:
             if len(self.image_list) - self.index > 1:
                 self.index += 1
@@ -463,15 +468,15 @@ class Win(QMainWindow):
             self.info_label.setText(str(im.size) + ' ' + self.names[self.index])
 
     def previous(self):
+
         if len(self.image_list) != 0:
-            if abs(self.index) - len(self.image_list) <= -2:
+            if abs(self.index)-1 - len(self.image_list) <= -2:
                 self.index -= 1
             else:
                 self.index = 0
             im = Image.open(self.image_list[self.index])
             h = self.height()
             w = self.width()
-
             im_h = im.size[1]
             im_w = im.size[0]
             scale_coef = (h - 170) / im_h
